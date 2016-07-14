@@ -2,7 +2,7 @@
 Example of a single-layer bidirectional long short-term memory network trained with
 connectionist temporal classification to predict phoneme sequences from nFeatures x nFrames
 arrays of Mel-Frequency Cepstral Coefficients.  This is basically a recreation of an experiment
-on the TIMIT corpus from chapter 7 of Alex Graves's book (Graves, Alex. Supervised Sequence 
+on the TIMIT data set from chapter 7 of Alex Graves's book (Graves, Alex. Supervised Sequence 
 Labelling with Recurrent Neural Networks, volume 385 of Studies in Computational Intelligence.
 Springer, 2012.), minus the early stopping.
 
