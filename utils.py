@@ -53,7 +53,7 @@ def data_lists_to_batches(inputList, targetList, batchSize):
     start, end = (0, batchSize)
     dataBatches = []
 
-    while end < len(inputList):
+    while end <= len(inputList):
         batchSeqLengths = np.zeros(batchSize)
         for batchI, origI in enumerate(randIxs[start:end]):
             batchSeqLengths[batchI] = inputList[origI].shape[-1]
