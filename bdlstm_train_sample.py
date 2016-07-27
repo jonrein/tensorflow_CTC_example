@@ -12,7 +12,7 @@ from __future__ import division
 from __future__ import print_function
 
 import tensorflow as tf
-from tensorflow.contrib.ctc import ctc_ops as ctc
+from tensorflow.python.ops import ctc_ops as ctc
 from tensorflow.python.ops import rnn_cell
 from tensorflow.python.ops.rnn import bidirectional_rnn
 import numpy as np
