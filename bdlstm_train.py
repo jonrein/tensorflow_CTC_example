@@ -15,8 +15,6 @@ from __future__ import print_function
 
 import tensorflow as tf
 from tensorflow.python.ops import ctc_ops as ctc
-from tensorflow.python.ops import rnn_cell
-from tensorflow.python.ops.rnn import bidirectional_rnn
 import numpy as np
 from utils import load_batched_data
 
@@ -51,7 +49,7 @@ with graph.as_default():
     #  Reshape to 2-D tensor (nTimeSteps*batchSize, nfeatures)
     inputXrs = tf.reshape(inputX, [-1, nFeatures])
     #  Split to get a list of 'n_steps' tensors of shape (batch_size, n_hidden)
-    inputList = tf.split(0, maxTimeSteps, inputXrs)
+    inputList = tf.split(inputXrs, maxTimeSteps, 0)
     targetIxs = tf.placeholder(tf.int64)
     targetVals = tf.placeholder(tf.int32)
     targetShape = tf.placeholder(tf.int64)
@@ -70,18 +68,18 @@ with graph.as_default():
     biasesClasses = tf.Variable(tf.zeros([nClasses]))
 
     ####Network
-    forwardH1 = rnn_cell.LSTMCell(nHidden, use_peepholes=True, state_is_tuple=True)
-    backwardH1 = rnn_cell.LSTMCell(nHidden, use_peepholes=True, state_is_tuple=True)
-    fbH1, _, _ = bidirectional_rnn(forwardH1, backwardH1, inputList, dtype=tf.float32,
-                                       scope='BDLSTM_H1')
+    forwardH1 = tf.contrib.rnn.LSTMCell(nHidden, use_peepholes=True, state_is_tuple=True)
+    backwardH1 = tf.contrib.rnn.LSTMCell(nHidden, use_peepholes=True, state_is_tuple=True)
+    fbH1, _, _ = tf.contrib.rnn.static_bidirectional_rnn(forwardH1, backwardH1, inputList, dtype=tf.float32,
+                                                         scope='BDLSTM_H1')
     fbH1rs = [tf.reshape(t, [batchSize, 2, nHidden]) for t in fbH1]
-    outH1 = [tf.reduce_sum(tf.mul(t, weightsOutH1), reduction_indices=1) + biasesOutH1 for t in fbH1rs]
+    outH1 = [tf.reduce_sum(tf.multiply(t, weightsOutH1), reduction_indices=1) + biasesOutH1 for t in fbH1rs]
 
     logits = [tf.matmul(t, weightsClasses) + biasesClasses for t in outH1]
 
     ####Optimizing
-    logits3d = tf.pack(logits)
-    loss = tf.reduce_mean(ctc.ctc_loss(logits3d, targetY, seqLengths))
+    logits3d = tf.stack(logits)
+    loss = tf.reduce_mean(ctc.ctc_loss(targetY, logits3d, seqLengths))
     optimizer = tf.train.MomentumOptimizer(learningRate, momentum).minimize(loss)
 
     ####Evaluating
@@ -93,7 +91,7 @@ with graph.as_default():
 ####Run session
 with tf.Session(graph=graph) as session:
     print('Initializing')
-    tf.initialize_all_variables().run()
+    tf.global_variables_initializer().run()
     for epoch in range(nEpochs):
         print('Epoch', epoch+1, '...')
         batchErrors = np.zeros(len(batchedData))

@@ -5,4 +5,4 @@ bdlstm_train.py trains a model on the TIMIT training data set; assumes appropria
 
 bdlstm_train_sample.py trains a model on the 8-sample toy data set in the "sample_data" directory
 
-Assumes TensorFlow version 0.9.0
+Assumes TensorFlow version 1.0.0
