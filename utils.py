@@ -45,9 +45,7 @@ def data_lists_to_batches(inputList, targetList, batchSize):
     
     assert len(inputList) == len(targetList)
     nFeatures = inputList[0].shape[0]
-    maxSteps = 0
-    for inp in inputList:
-        maxSteps = max(maxSteps, inp.shape[1])
+    maxSteps = max(inp.shape[1] for inp in inputList)
         
     randIxs = np.random.permutation(len(inputList))
     start, end = (0, batchSize)
